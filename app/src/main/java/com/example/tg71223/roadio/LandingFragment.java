@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Landing extends Fragment {
+public class LandingFragment extends Fragment {
 
 
-    public Landing() {
+    public LandingFragment() {
         // Required empty public constructor
     }
 
@@ -24,8 +24,8 @@ public class Landing extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View thisView = inflater.inflate(R.layout.fragment_landing2, container, false);
-        return thisView;
+        View view = inflater.inflate(R.layout.fragment_landing2, container, false);
+        return view;
     }
 
 }
