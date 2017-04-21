@@ -28,6 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
+                android:inputType="text"
+                android:textColor="@android:color/black"
                 android:hint="Login"
                 android:textColorHint="@android:color/black"
                 android:background="#fafafa"/>
@@ -35,9 +37,11 @@
                 android:id="@+id/userPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Password"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
+                android:inputType="text"
                 android:background="#fafafa"/>
             <Button
                 android:id="@+id/submitButton"

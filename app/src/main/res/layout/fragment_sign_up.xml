@@ -13,6 +13,7 @@
             android:layout_weight="2"
             android:background="@android:color/transparent"></FrameLayout>
         <LinearLayout
+            android:id="@+id/signUpContent"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="12"
@@ -25,54 +26,77 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
+                android:inputType="text"
+                android:textColor="@android:color/black"
                 android:hint="First Name"
                 android:textColorHint="@android:color/black"
-                android:background="#fafafa"/>
+                android:background="#fafafa"
+                android:tag="name"/>
             <EditText
                 android:id="@+id/signUpSecondName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Last name"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
-                android:background="#fafafa"/>
+                android:inputType="text"
+                android:background="#fafafa"
+                android:tag="name"/>
             <EditText
                 android:id="@+id/signUpEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Email"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
-                android:background="#fafafa"/>
+                android:maxLines="1"
+                android:background="#fafafa"
+                android:inputType="textEmailAddress"
+                android:tag="email"/>
             <EditText
                 android:id="@+id/signUpPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Password"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
-                android:background="#fafafa"/>
+                android:inputType="text"
+                android:background="#fafafa"
+                android:tag="password"/>
             <EditText
                 android:id="@+id/signUpPasswordConfirm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Confirm Password"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
-                android:background="#fafafa"/>
+                android:inputType="text"
+                android:background="#fafafa"
+                android:tag="confirm"/>
             <EditText
                 android:id="@+id/signUpCountry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
                 android:hint="Country"
                 android:textColorHint="@android:color/black"
                 android:layout_marginBottom="15dp"
+                android:inputType="text"
                 android:background="#fafafa"/>
             <Button
                 android:id="@+id/submitSignUpButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign Up" />
+                android:text="Submit" />
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Back to Login" />
         </LinearLayout>
         <FrameLayout
             android:layout_width="0dp"
