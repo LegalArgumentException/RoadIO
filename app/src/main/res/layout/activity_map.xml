@@ -1,23 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/settings_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".MapActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:orientation="horizontal"
+        android:layout_weight="8">
 
-    <Button
-        android:id="@+id/button2"
-        android:background="@drawable/green_button"
-        android:layout_width="200dp"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="51dp"
-        android:text="Start Drive" />
-</RelativeLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="RoadIO"
+            android:layout_gravity="start"
+            android:textAlignment="viewStart" />
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_settings_applications_black_24dp" />
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            tools:context=".MapActivity"
+            android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+        <TableLayout
+            android:id="@+id/stat_table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/rectangle_border"
+            android:visibility="gone">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:text="@string/time_elapsed"
+                    android:textColor="#000000"
+                    />
+                <TextView
+                    android:text="@string/distance_traveled"
+                    android:textColor="#000000" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <TextView
+                    android:id="@+id/elapsed_time"
+                    android:text=" "
+                    android:textColor="#000000" />
+                <TextView
+                    android:id="@+id/distance_traveled"
+                    android:text=" "
+                    android:textColor="#000000"/>
+            </TableRow>
+
+        </TableLayout>
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="200dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/green_button"
+            android:text="Start Trip"
+            android:visibility="visible"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/stop_button"
+            android:layout_width="200dp"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/red_button"
+            android:text="Stop Trip"
+            android:visibility="gone" />
+    </RelativeLayout>
+</LinearLayout>
