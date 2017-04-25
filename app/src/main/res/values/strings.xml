@@ -6,4 +6,5 @@
     <string name="tag_line">A safer world, starting from your dashcam</string>
     <string name="distance_traveled"><u>Distance Traveled</u></string>
     <string name="time_elapsed"><u>Time Elapsed</u></string>
+    <string name="title_activity_preference">PreferenceActivity</string>
 </resources>

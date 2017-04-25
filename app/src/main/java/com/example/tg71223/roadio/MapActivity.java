@@ -6,12 +6,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +38,10 @@ import com.google.android.gms.vision.text.Text;
 import java.text.DecimalFormat;
 import java.util.List;
 
+/****************************
+ *
+ */
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -48,8 +54,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     Marker mCurrLocationMarker;
     PolylineOptions tripOptions;
     Boolean tripStart;
+    Boolean lockCamera;
     TextView distanceView;
     TextView timeView;
+    Chronometer elapsedTime;
 
     //TODO put all these into an object
     double distance;
@@ -64,8 +72,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        // Set starting trip state to false
+        elapsedTime = (Chronometer) findViewById(R.id.elapsed_time);
+        distanceView = (TextView) findViewById(R.id.distance_traveled);
+
+        // Set starting trip state and unlocks camera
         tripStart = false;
+        lockCamera = false;
 
         // Async inflate map with google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -80,6 +92,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 startTrip();
             }
         });
+
+        Button stopButton = (Button) findViewById(R.id.stop_button);
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopTrip();
+            }
+        });
+
+        Button saveButton = (Button) findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Trip Saved", Toast.LENGTH_SHORT).show();
+                resetTrip();
+            }
+        });
+
+        Button deleteButton = (Button) findViewById(R.id.delete_button);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
+                resetTrip();
+            }
+        });
+
     }
 
     @Override
@@ -245,14 +284,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Get current LatLng
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        // Add new distance to current distance and reflect changes
-        if(distanceView != null && mLastLocation != null) {
-            LatLng prevLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            double recentDistance = calculateDistance(prevLatLng, latLng);
-            distance += recentDistance;
-            distanceView.setText(String.format("%.2f", distance) + " km");
-        }
-
         if(tripStart) {
             //Add polyline to show trip
             tripOptions.add(latLng);
@@ -260,10 +291,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             //Draw polylines
             mMap.addPolyline(tripOptions);
 
-            mLastLocation = location;
+            // Add new distance to current distance and reflect changes
+            if(mLastLocation != null) {
+                LatLng prevLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                double recentDistance = calculateDistance(prevLatLng, latLng);
+                distance += recentDistance;
+                distanceView.setText(String.format("%.2f", distance) + " km");
+            }
+
         }
         //Move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+        if(!lockCamera) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
+
+        mLastLocation = location;
 
     }
 
@@ -274,34 +316,59 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     private void moveToBounds(List<LatLng> arr)
     {
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(int i = 0; i < arr.size();i++){
-            builder.include(arr.get(i));
+        if(arr.size() != 0) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (int i = 0; i < arr.size(); i++) {
+                builder.include(arr.get(i));
+            }
+            LatLngBounds bounds = builder.build();
+            int padding = 40; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            mMap.animateCamera(cu);
         }
-        LatLngBounds bounds = builder.build();
-        int padding = 40; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.animateCamera(cu);
     }
 
+    /************************
+     * Resets all current data and starts recording a new trip as well as
+     */
     public void startTrip() {
-        distance = 0;
-        time = 0;
-        tripStart = true;
-        tripOptions = new PolylineOptions();
-        distanceView = (TextView) findViewById(R.id.distance_traveled);
-        distanceView.setText("0.0 km");
-        timeView = (TextView) findViewById(R.id.elapsed_time);
-        timeView.setText("WIP");
+
         findViewById(R.id.start_button).setVisibility(View.GONE);
         findViewById(R.id.stop_button).setVisibility(View.VISIBLE);
         findViewById(R.id.stat_table).setVisibility(View.VISIBLE);
+
+        // Reset values and start new trip
+        distance = 0;
+        time = 0;
+        tripOptions = new PolylineOptions();
+        distanceView = (TextView) findViewById(R.id.distance_traveled);
+        distanceView.setText("0.0 km");
+        elapsedTime.setBase(SystemClock.elapsedRealtime());
+        elapsedTime.start();
+//        timeView = (TextView) findViewById(R.id.elapsed_time);
+//        timeView.setText("WIP");
+
+        tripStart = true;
+        lockCamera = false;
     }
 
     public void stopTrip() {
-        //stop location updates when Activity is no longer active
+        tripStart = false;
+        lockCamera = true;
+        elapsedTime.stop();
+        findViewById(R.id.stop_button).setVisibility(View.GONE);
+        findViewById(R.id.save_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+        moveToBounds(tripOptions.getPoints());
+    }
 
+    public void resetTrip() {
+        findViewById(R.id.start_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.stat_table).setVisibility(View.GONE);
+        findViewById(R.id.save_button).setVisibility(View.GONE);
+        findViewById(R.id.delete_button).setVisibility(View.GONE);
+
+        lockCamera = false;
     }
 
     public double calculateDistance(LatLng prev, LatLng current) {
