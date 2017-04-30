@@ -30,5 +30,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services:10.2.1'
     compile 'com.android.support:design:25.3.1'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.3.2'
     testCompile 'junit:junit:4.12'
 }

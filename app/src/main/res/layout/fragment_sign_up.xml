@@ -22,7 +22,7 @@
             android:padding="20dp"
             android:background="@drawable/rectangle_border">
             <EditText
-                android:id="@+id/signUpFirstName"
+                android:id="@+id/signUpUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
@@ -32,17 +32,7 @@
                 android:textColorHint="@android:color/black"
                 android:background="#fafafa"
                 android:tag="name"/>
-            <EditText
-                android:id="@+id/signUpSecondName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:hint="Last name"
-                android:textColorHint="@android:color/black"
-                android:layout_marginBottom="15dp"
-                android:inputType="text"
-                android:background="#fafafa"
-                android:tag="name"/>
+
             <EditText
                 android:id="@+id/signUpEmail"
                 android:layout_width="match_parent"

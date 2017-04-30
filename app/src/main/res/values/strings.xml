@@ -7,4 +7,6 @@
     <string name="distance_traveled"><u>Distance Traveled</u></string>
     <string name="time_elapsed"><u>Time Elapsed</u></string>
     <string name="title_activity_preference">PreferenceActivity</string>
+    <string name="logFile">LogFile</string>
+    <string name="locationDataFile">LocationData</string>
 </resources>

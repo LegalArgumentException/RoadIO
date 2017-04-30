@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 
 /**
@@ -16,10 +17,13 @@ import android.widget.Button;
 public class LandingFragment extends Fragment {
 
     LoginFragmentListener mCallback;
+    EditText userName;
+    EditText userPassword;
+
 
     public interface LoginFragmentListener {
         public void transitionScene();
-        public void changeActivity();
+        public void cognitoLogin(String uName, String uPassword);
     }
 
     public LandingFragment() {
@@ -54,9 +58,11 @@ public class LandingFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.changeActivity();
+                mCallback.cognitoLogin(userName.getText().toString(), userPassword.getText().toString());
             }
         });
+        userName = (EditText) view.findViewById(R.id.userLogin);
+        userPassword = (EditText) view.findViewById(R.id.userPassword);
         return view;
     }
 

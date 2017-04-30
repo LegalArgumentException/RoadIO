@@ -4,16 +4,17 @@ package com.example.tg71223.roadio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentContainer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class SignUpFragment extends Fragment {
 
     public interface SignUpFragmentListener {
         public void transitionScene();
-        public void changeActivity();
+        public void cognitoSignUp(String userPassword, CognitoUserAttributes userAttributes);
     }
 
     public SignUpFragment() {
@@ -77,15 +78,9 @@ public class SignUpFragment extends Fragment {
                 }
                 for(EditText editText : editTexts) {
                     switch (editText.getId()) {
-                        case R.id.signUpFirstName :
+                        case R.id.signUpUserName:
                             if(editText.getText().toString().equals("")) {
-                                Toast.makeText(view.getContext(), "First name must be provided", Toast.LENGTH_SHORT).show();
-                                correctFormat = false;
-                            }
-                            break;
-                        case R.id.signUpSecondName :
-                            if(editText.getText().toString().equals("")) {
-                                Toast.makeText(view.getContext(), "Last name must be provided", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(view.getContext(), "Username must be provided", Toast.LENGTH_SHORT).show();
                                 correctFormat = false;
                             }
                             break;
@@ -96,18 +91,27 @@ public class SignUpFragment extends Fragment {
                                 correctFormat = false;
                             }
                             break;
-                        case R.id.signUpPasswordConfirm :
-                            if(!editText.getText().toString().equals(password)) {
-                                Toast.makeText(view.getContext(), "Passwords must match", Toast.LENGTH_SHORT).show();
-                                correctFormat = false;
-                            }
+//                        case R.id.signUpPasswordConfirm :
+//                            if(!editText.getText().toString().equals(password)) {
+//                                Toast.makeText(view.getContext(), "Passwords must match", Toast.LENGTH_SHORT).show();
+//                                correctFormat = false;
+//                            }
                         default:
                             break;
                     }
                 }
                 correctFormat = true; // TEST
                 if(correctFormat) {
-                    mCallback.changeActivity();
+                    CognitoUserAttributes userAttributes = new CognitoUserAttributes();
+                    String preferredUsername = ((EditText) view.findViewById(R.id.signUpUserName)).getText().toString();
+                    String email = ((EditText) view.findViewById(R.id.signUpEmail)).getText().toString();
+                    userAttributes.addAttribute("preferred_username", preferredUsername);
+                    userAttributes.addAttribute("email", email);
+                    userAttributes.addAttribute("custom:customerType", "driver");
+                    userAttributes.addAttribute("locale", "en-US");
+                    Log.d("RoadIO", "PreferredUsername: " + userAttributes.getAttributes().get("preferred_username") + ", Email: " + userAttributes.getAttributes().get("email")
+                            + ", CustomerType: " + userAttributes.getAttributes().get("customerType") + ", locale: " + userAttributes.getAttributes().get("locale"));
+                    mCallback.cognitoSignUp(((EditText) view.findViewById(R.id.signUpPassword)).getText().toString(), userAttributes);
                 }
             }
         });

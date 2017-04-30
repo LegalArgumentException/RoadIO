@@ -2,6 +2,7 @@ package com.example.tg71223.roadio;
 
 import android.*;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -42,10 +44,11 @@ import java.util.List;
  *
  */
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+//    implements OnMapReadyCallback,
+//    GoogleApiClient.ConnectionCallbacks,
+//    GoogleApiClient.OnConnectionFailedListener,
+//    LocationListener
 
     GoogleMap mMap;
     LocationRequest mLocationRequest;
@@ -126,9 +129,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onPause();
 
         //stop location updates when Activity is no longer active
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
+//        if (mGoogleApiClient != null) {
+//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+//        }
     }
 
 
@@ -163,7 +166,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
             } else {
-                // No explanation needed, we can request the permission.
+                // No explanation needed, we can request the permission
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION );
@@ -185,10 +188,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             android.Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
 
-                        if (mGoogleApiClient == null) {
-                            buildGoogleApiClient();
-                        }
-                        mMap.setMyLocationEnabled(true);
+//                        if (mGoogleApiClient == null) {
+//                            buildGoogleApiClient();
+//                        }
+//                        mMap.setMyLocationEnabled(true);
+                        Log.d("BackgroundGPS", "Started Service From MapActivity");
+                        startLocationService(); // Start Service
                     }
 
                 } else {
@@ -220,8 +225,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     android.Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 //Location Permission already granted
-                buildGoogleApiClient();
-                mMap.setMyLocationEnabled(true);
+                // buildGoogleApiClient();
+                // mMap.setMyLocationEnabled(true);
+                Log.d("BackgroundGPS", "Started Service From MapActivity");
+                startLocationService();
             } else {
                 //Request Location Permission, not already granted
                 checkLocationPermission();
@@ -229,40 +236,46 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         else {
             // Earlier version of Android that doesn't need explicit user validation
-            buildGoogleApiClient();
-            mMap.setMyLocationEnabled(true);
+            // buildGoogleApiClient();
+            // mMap.setMyLocationEnabled(true);
+            startLocationService();
         }
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
+//    protected synchronized void buildGoogleApiClient() {
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .addConnectionCallbacks(this)
+//                .addOnConnectionFailedListener(this)
+//                .addApi(LocationServices.API)
+//                .build();
+//        mGoogleApiClient.connect();
+//    }
+
+//    @Override
+//    public void onConnected(Bundle bundle) {
+//        // Creates the Location Request and sets the parameters of how long to wait between location
+//        // requests
+//        mLocationRequest = new LocationRequest();
+//        mLocationRequest.setInterval(1000);
+//        mLocationRequest.setFastestInterval(1000);
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+//        if (ContextCompat.checkSelfPermission(this,
+//                android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+//        }
+//    }
+
+    private void startLocationService() {
+        Intent intentService = new Intent(this, BackgroundLocationService.class);
+        startService(intentService);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        // Creates the Location Request and sets the parameters of how long to wait between location
-        // requests
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {}
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {}
+//    @Override
+//    public void onConnectionSuspended(int i) {}
+//
+//    @Override
+//    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     // ==========================================
     // Trip Logic and Map Manipulation
@@ -274,40 +287,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      *
      * @param location : Location object with most current Location data
      */
-    @Override
-    public void onLocationChanged(Location location)
-    {
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
-
-        // Get current LatLng
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        if(tripStart) {
-            //Add polyline to show trip
-            tripOptions.add(latLng);
-
-            //Draw polylines
-            mMap.addPolyline(tripOptions);
-
-            // Add new distance to current distance and reflect changes
-            if(mLastLocation != null) {
-                LatLng prevLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                double recentDistance = calculateDistance(prevLatLng, latLng);
-                distance += recentDistance;
-                distanceView.setText(String.format("%.2f", distance) + " km");
-            }
-
-        }
-        //Move map camera
-        if(!lockCamera) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-        }
-
-        mLastLocation = location;
-
-    }
+//    @Override
+//    public void onLocationChanged(Location location)
+//    {
+//        if (mCurrLocationMarker != null) {
+//            mCurrLocationMarker.remove();
+//        }
+//
+//        // Get current LatLng
+//        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//        if(tripStart) {
+//            //Add polyline to show trip
+//            tripOptions.add(latLng);
+//
+//            //Draw polylines
+//            mMap.addPolyline(tripOptions);
+//
+//            // Add new distance to current distance and reflect changes
+//            if(mLastLocation != null) {
+//                LatLng prevLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//                double recentDistance = calculateDistance(prevLatLng, latLng);
+//                distance += recentDistance;
+//                distanceView.setText(String.format("%.2f", distance) + " km");
+//            }
+//
+//        }
+//        //Move map camera
+//        if(!lockCamera) {
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+//        }
+//
+//        mLastLocation = location;
+//
+//    }
 
     /************************
      * Draws the current trip on the map and sets the constraints to fit the entirety of the trip
